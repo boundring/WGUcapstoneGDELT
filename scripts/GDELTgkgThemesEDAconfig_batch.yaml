@@ -1,0 +1,215 @@
+# Title of the document
+title: "GDELT GKG Themes EDA - 05/24/2020 to 06/22/2020"
+
+# Metadata
+dataset:
+  description: "GDELT - Global Knowledge Graph (GKG) table records from 05/24/2020 to 06/22/2020, normalized for V1Themes entries. (See project documentation for details. All variable descriptions are by reference from http://data.gdeltproject.org/documentation/GDELT-Global_Knowledge_Graph_Codebook-V2.1.pdf)"
+  creator: "Leetaru, K. & Schrodt, P. A."
+  author: "Richard Allan Smith Jr."
+  copyright_holder: "GDELT Project"
+  copyright_year: "2013-2021"
+  url: "https://www.gdeltproject.org/data"
+
+variables:
+    descriptions:
+        'GKGRECORDID' : "(string) Each GKG record is assigned a globally unique identifier. Unlike the EVENT system, which uses semi-sequential numbering to assign numeric IDs to each event record, the GKG system uses a date-oriented serial number. Each GKG record ID takes the form 'YYYYMMDDHHMMSS-X' or 'YYYYMMDDHHMMSS-TX' in which the first portion of the ID is the full date+time of the 15 minute update batch that this record was created in, followed by a dash, followed by sequential numbering for all GKG records created as part of that update batch. Records originating from a document that was translated by GDELT Translingual will have a capital 'T' appearing immediately after the dash to allow filtering of English/non-English material simply by its record identifier. Thus, the fifth GKG record created as part of the update batch generated at 3:30AM on February 3, 2015 would have a GKGRECORDID of '20150203033000-5' and if it was based on a French-language document that was translated, it would have the ID '20150203033000-T5'. This ID can be used to uniquely identify this particular record across the entire GKG database. Note that due to the presence of the dash, this field should be treated as a string field and NOT as a numeric field."
+        'V21DATE' : "(integer) This is the date in YYYYMMDDHHMMSS format (converted to Pandas datetime) on which the news media used to construct this GKG file was published. NOTE that unlike the main GDELT event stream files, this date represents the date of publication of the document from which the information was extracted – if the article discusses events in the past, the date is NOT time-shifted as it is for the GDELT event stream. This date will be the same for all rows in a file and is redundant from a data processing standpoint, but is provided to make it easier to load GKG files directly into an SQL database for analysis. NOTE: for some special collections this value may be 0 indicating that the field is either not applicable or not known for those materials. For example, OCR’d historical document collections may not have robust metadata on publication date. NOTE: the GKG 2.0 format still encoded this date in YYYYMMDD format, while under GKG 2.1 it is now in YYYYMMDDHHMMSS format."
+        'V2SourceCommonName' : "(text) This is a human-friendly identifier of the source of the document. For material originating from the open web with a URL this field will contain the top-level domain the page was from. For BBC Monitoring material it will contain 'BBC Monitoring' and for JSTOR material it will contain 'JSTOR.' This field is intended for human display of major sources as well as for network analysis of information flows by source, obviating the requirement to perform domain or other parsing of the DocumentIdentifier field."
+        'V2DocumentIdentifier' : "(text) This is the unique external identifier for the source document. It can be used to uniquely identify the document and access it if you have the necessary subscriptions or authorizations and/or the document is public access. This field can contain a range of values, from URLs of open web resources to textual citations of print or broadcast material to DOI identifiers for various document repositories. For example, if SOURCECOLLECTION is equal to 1, this field will contain a fully-qualified URL suitable for direct access. If SOURCECOLLECTION is equal to 2, this field will contain a textual citation akin to what would appear in an academic journal article referencing that document (NOTE that the actual citation format will vary (usually between APA, Chicago, Harvard, or MLA) depending on a number of factors and no assumptions should be made on its precise format at this time due to the way in which this data is currently provided to GDELT – future efforts will focus on normalization of this field to a standard citation format). If SOURCECOLLECTION is 3, the field will contain a numeric or alpha-numeric DOI that can be typed into JSTOR’s search engine to access the document if your institution has a JSTOR subscription."
+        'V15Tone_Tone' : "(floating) This is the average 'tone' of the document as a whole. The score ranges from -100 (extremely negative) to +100 (extremely positive). Common values range between -10 and +10, with 0 indicating neutral. This is calculated as Positive Score minus Negative Score. Note that both Positive Score and Negative Score are available separately below as well. A document with a Tone score close to zero may either have low emotional response or may have a Positive Score and Negative Score that are roughly equivalent to each other, such that they nullify each other. These situations can be detected either through looking directly at the Positive Score and Negative Score variables or through the Polarity variable."
+        'V15Tone_Positive' : "(floating point number) This is the percentage of all words in the article that were found to have a positive emotional connotation. Ranges from 0 to +100."
+        'V15Tone_Negative' : "(floating point number) This is the percentage of all words in the article that were found to have a negative emotional connotation. Ranges from 0 to +100."
+        'V15Tone_Polarity' : "(floating point number) This is the percentage of words that had matches in the tonal dictionary as an indicator of how emotionally polarized or charged the text is. If Polarity is high, but Tone is neutral, this suggests the text was highly emotionally charged, but had roughly equivalent numbers of positively and negatively charged emotional words."
+        'V15Tone_ARD' : "Activity Reference Density (floating point number) This is the percentage of words that were active words offering a very basic proxy of the overall 'activeness' of the text compared with a clinically descriptive text."
+        'V15Tone_SGRD' : "Self/Group Reference Density (floating point number) This is the percentage of all words in the article that are pronouns, capturing a combination of self-references and group-based discourse. News media material tends to have very low densities of such language, but this can be used to distinguish certain classes of news media and certain contexts."
+        'V15Tone_WordCount' : "(integer) This is the total number of words in the document. This field was added in version 1.5 of the format."
+        'V1Themes' : "(semi-colon-delimited) This is the list of all Themes found in the document. For the complete list of possible themes, see the Category List spreadsheet. At the time of this writing there are over 275 themes currently recognized by the system. This field is identical in format and population as the corresponding field in the GKG 1.0 format."
+        
+
+# infer dtypes
+infer_dtypes: false
+
+# Show the description at each variable (in addition to the overview tab)
+show_variable_description: true
+
+# Number of workers (0=multiprocessing.cpu_count())
+pool_size: 0
+
+# Show the progress bar
+progress_bar: true
+
+# Per variable type description settings
+vars:
+    num:
+        quantiles:
+              - 0.05
+              - 0.25
+              - 0.5
+              - 0.75
+              - 0.95
+        skewness_threshold: 20
+        low_categorical_threshold: 5
+        # Set to zero to disable
+        chi_squared_threshold: 0.999
+    cat:
+        length: false
+        characters: false
+        words: false
+        cardinality_threshold: 3000
+        n_obs: 30
+        # Set to zero to disable
+        chi_squared_threshold: 0
+        coerce_str_to_date: false
+        redact: false
+        histogram_largest: 50
+    bool:
+        n_obs: 3
+        # string to boolean mapping dict
+        mappings:
+            t: true
+            f: false
+            yes: true
+            no: false
+            y: true
+            n: false
+            true: true
+            false: false
+    file:
+        active: false
+    image:
+        active: false
+        exif: true
+        hash: true
+    path:
+        active: false
+    url:
+        active: true
+
+# Sort the variables. Possible values: "ascending", "descending" or null (leaves original sorting)
+sort: null
+
+# which diagrams to show
+missing_diagrams:
+    bar: true
+    matrix: false
+    heatmap: false
+    dendrogram: false
+
+correlations:
+    pearson:
+      calculate: true
+      warn_high_correlations: true
+      threshold: 0.9
+    spearman:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+    kendall:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+    phi_k:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+    cramers:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+
+
+# Bivariate / Pairwise relations
+interactions:
+  targets: ['V15Tone_Tone', 'V21DATE']
+  continuous: 
+
+# For categorical
+categorical_maximum_correlation_distinct: 100
+
+report:
+  precision: 10
+
+# Plot-specific settings
+plot:
+    # Image format (svg or png)
+    image_format: "svg"
+    dpi: 500
+
+    scatter_threshold: 1000
+
+    correlation:
+        cmap: 'RdBu'
+        bad: '#000000'
+
+    missing:
+        cmap: 'RdBu'
+        # Force labels when there are > 50 variables
+        # https://github.com/ResidentMario/missingno/issues/93#issuecomment-513322615
+        force_labels: true
+
+    pie:
+        # display a pie chart if the number of distinct values is smaller or equal (set to 0 to disable)
+        max_unique: 10
+
+    histogram:
+        x_axis_labels: true
+
+        # Number of bins (set to 0 to automatically detect the bin size)
+        bins: 40
+
+        # Maximum number of bins (when bins=0)
+        max_bins: 50
+
+# The number of observations to show
+n_obs_unique: 20
+n_extreme_obs: 10
+n_freq_table_max: 30
+
+# Use `deep` flag for memory_usage
+memory_deep: false
+
+# Configuration related to the duplicates
+duplicates:
+    head: 10
+    key: "# duplicates"
+
+# Configuration related to the samples area
+samples:
+    head: 10
+    tail: 10
+    random: 0
+
+# Configuration related to the rejection of variables
+reject_variables: false
+
+# When in a Jupyter notebook
+notebook:
+    iframe:
+        height: '800px'
+        width: '100%'
+        # or 'src'
+        attribute: 'srcdoc'
+
+html:
+    # Minify the html
+    minify_html: true
+
+    # Offline support
+    use_local_assets: true
+
+    # If true, single file, else directory with assets
+    inline: true
+
+    # Show navbar
+    navbar_show: true
+
+    # Assets prefix if inline = true
+    assets_prefix: null
+
+    # Styling options for the HTML report
+    style:
+      theme: null
+      logo: ""
+      primary_color: "#337ab7"
+
+    full_width: false

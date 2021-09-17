@@ -1,0 +1,218 @@
+# Title of the document
+title: "GDELT Mentions EDA - 05/24/2020 to 06/22/2020"
+
+# Metadata
+dataset:
+  description: "GDELT - Events/Mentions table records from 05/24/2020 to 06/22/2020, with a number of dropped columns. (See project documentation for details.  All variable descriptions are by reference from http://data.gdeltproject.org/documentation/GDELT-Event_Codebook-V2.0.pdf). Referenced description follows: The Mentions table is a new addition to GDELT 2.0 and records each mention of the events in the Event table, making it possible to track the trajectory and network structure of a story as it flows through the global media system. Each mention of an event receives its own entry in the Mentions table – thus an event which is mentioned in 100 articles will be listed 100 times in the Mentions table. Mentions are recorded irrespective of the date of the original event, meaning that a mention today of an event from a year ago will still be recorded, making it possible to trace discussion of 'anniversary events' or historical events being recontextualized into present actions. If a news report mentions multiple events, each mention is recorded separately in this table. For translated documents, all measures below are based on its English translation. Several of the new measures recorded in the Mentions table make it possible to better filter events based on how confident GDELT was in its extraction of that event. When trying to understand news media spanning the entire globe, one finds that journalism is rife with ambiguities, assumed background knowledge, and complex linguistic structures. Not every event mention will take the form of 'American President Barack Obama met with Russian President Vladimir Putin yesterday at a trade summit in Paris, France.' Instead, an event mention might more commonly appear as 'Obama and Putin were in Paris yesterday for a trade summit. The two leaders met backstage where he discussed his policy on Ukraine.' To which of the two leader(s) do 'he' and 'his' refer? Is Obama discussing Obama's policy on Ukraine, or is Obama discussing Putin's policy on Ukraine, or is it Putin discussing Putin's policy or perhaps Putin discussing Obama's policy? While additional cues may be available in the surrounding text, ambiguous event mentions like this are exceptionally common across the world's media. Similarly, it would be difficult indeed to maintain an exhaustive list of every single political figure in the entire world and thus context is often critical for disambiguating the geographic affiliation of an actor. Even in the case of more senior political leadership, a reference to 'Renauld's press conference this afternoon in Port-au-Prince' most likely refers to Lener Renauld, the Minister of Defense of Haiti, but this disambiguation still carries with it some degree of ambiguity. GDELT makes use of an array of natural language processing algorithms like coreference and deep parsing using whole-of-document context. While these enormously increase GDELT's ability to understand and extract ambiguous and linguistically complex events, such extractions also come with a higher potential for error. Under GDELT 1.0, the NumMentions field as designed as a composite score of the absolute number of unique documents mentioning an event and the number of revisions to the text required by these various algorithms, up to six revision passes. Under GDELT 2.0, the Mentions table now separates these, with each record in the Mentions table recording an individual mention of an event in an article, while the new Confidence field records GDELT's confidence in its extraction of that event from that particular article. This field is a percent, ranging from 10 to 100% and indicates how aggressively GDELT had to perform tasks like coreference or grammatical restructuring to extract the event from that article. Sorting all mentions of an event by this field makes it possible to identify articles featuring the strongest and most unambiguous discussion of an event."
+  creator: "Leetaru, K. & Schrodt, P. A."
+  author: "Richard Allan Smith Jr."
+  copyright_holder: "GDELT Project"
+  copyright_year: "2013-2021"
+  url: "https://www.gdeltproject.org/data"
+
+variables:
+    descriptions:
+        'GLOBALEVENTID' : "(integer) This is the ID of the event that was mentioned in the article."
+        'EventTimeDate' : "(integer) This is the 15-minute timestamp (YYYYMMDDHHMMSS, parsed to Pandas datetime) when the event being mentioned was first recorded by GDELT (the DATEADDED field of the original event record). This field can be compared against the next one to identify events being mentioned for the first time (their first mentions) or to identify events of a particular vintage being mentioned now (such as filtering for mentions of events at least one week old)."
+        'MentionTimeDate' : "(integer) This is the 15-minute timestamp (YYYYMMDDHHMMSS, parsed to Pandas datetime) of the current update. This is identical for all entries in the update file but is included to make it easier to load the Mentions table into a database."
+        'MentionType' : "(integer) This is a numeric identifier that refers to the source collection the document came from and is used to interpret the MentionIdentifier in the next column. In essence, it specifies how to interpret the MentionIdentifier to locate the actual document. At present, it can hold one of the following values:
+\n1 = WEB (The document originates from the open web and the MentionIdentifier is a fully-qualified URL that can be used to access the document on the web).
+\n2 = CITATIONONLY (The document originates from a broadcast, print, or other offline source in which only a textual citation is available for the document. In this case the MentionIdentifier contains the textual citation for the document).
+\n3 = CORE (The document originates from the CORE archive and the MentionIdentifier contains its DOI, suitable for accessing the original document through the CORE website).
+\n4 = DTIC (The document originates from the DTIC archive and the MentionIdentifier contains its DOI, suitable for accessing the original document through the DTIC website).
+\n5 = JSTOR (The document originates from the JSTOR archive and the MentionIdentifier contains its DOI, suitable for accessing the original document through your JSTOR subscription if your institution subscribes to it).
+\n6 = NONTEXTUALSOURCE (The document originates from a textual proxy (such as closed captioning) of a non-textual information source (such as a video) available via a URL and the MentionIdentifier provides the URL of the non-textual original source. At present, this Collection Identifier is used for processing of the closed captioning streams of the Internet Archive Television News Archive in which each broadcast is available via a URL, but the URL offers access only to the video of the broadcast and does not provide any access to the textual closed captioning used to generate the metadata. This code is used in order to draw a distinction between URL-based textual material (Collection Identifier 1 (WEB) and URL-based non-textual material like the Television News Archive)."
+        'MentionSourceName' : "(string) This is a human-friendly identifier of the source of the document. For material originating from the open web with a URL this field will contain the top-level domain the page was from. For BBC Monitoring material it will contain 'BBC Monitoring' and for JSTOR material it will contain 'JSTOR.' This field is intended for human display of major sources as well as for network analysis of information flows by source, obviating the requirement to perform domain or other parsing of the MentionIdentifier field."
+        'MentionIdentifier' : "(string) This is the unique external identifier for the source document. It can be used to uniquely identify the document and access it if you have the necessary subscriptions or authorizations and/or the document is public access. This field can contain a range of values, from URLs of open web resources to textual citations of print or broadcast material to DOI identifiers for various document repositories. For example, if MentionType is equal to 1, this field will contain a fully-qualified URL suitable for direct access. If MentionType is equal to 2, this field will contain a textual citation akin to what would appear in an academic journal article referencing that document (NOTE that the actual citation format will vary (usually between APA, Chicago, Harvard, or MLA) depending on a number of factors and no assumptions should be made on its precise format at this time due to the way in which this data is currently provided to GDELT – future efforts will focus on normalization of this field to a standard citation format). If MentionType is 3, the field will contain a numeric or alpha-numeric DOI that can be typed into JSTOR's search engine to access the document if your institution has a JSTOR subscription."
+        'InRawText' : "(integer) This records whether the event was found in the original unaltered raw article text (a value of 1) or whether advanced natural language processing algorithms were required to synthesize and rewrite the article text to identify the event (a value of 0). See the discussion on the Confidence field below for more details. Mentions with a value of '1' in this field likely represent strong detail-rich references to an event."
+        'Confidence' : "(integer) Percent confidence in the extraction of this event from this article. See the discussion above (InRawText, also page."
+        'MentionDocTone' : "(numeric) The same contents as the AvgTone field in the Events table, but computed for this particular article. NOTE: users interested in emotional measures should use the MentionIdentifier field above to merge the Mentions table with the GKG table to access the complete set of 2,300 emotions and themes from the GCAM system.
+"
+
+# infer dtypes
+infer_dtypes: false
+
+# Show the description at each variable (in addition to the overview tab)
+show_variable_description: true
+
+# Number of workers (0=multiprocessing.cpu_count())
+pool_size: 0
+
+# Show the progress bar
+progress_bar: true
+
+# Per variable type description settings
+vars:
+    num:
+        quantiles:
+              - 0.05
+              - 0.25
+              - 0.5
+              - 0.75
+              - 0.95
+        skewness_threshold: 20
+        low_categorical_threshold: 5
+        # Set to zero to disable
+        chi_squared_threshold: 0.999
+    cat:
+        length: false
+        characters: false
+        words: false
+        cardinality_threshold: 3000
+        n_obs: 30
+        # Set to zero to disable
+        chi_squared_threshold: 0.999
+        coerce_str_to_date: true
+        redact: false
+        histogram_largest: 50
+    bool:
+        n_obs: 3
+        # string to boolean mapping dict
+        mappings:
+            t: true
+            f: false
+            yes: true
+            no: false
+            y: true
+            n: false
+            true: true
+            false: false
+    file:
+        active: false
+    image:
+        active: false
+        exif: true
+        hash: true
+    path:
+        active: false
+    url:
+        active: true
+
+# Sort the variables. Possible values: "ascending", "descending" or null (leaves original sorting)
+sort: null
+
+# which diagrams to show
+missing_diagrams:
+    bar: true
+    matrix: false
+    heatmap: false
+    dendrogram: false
+
+correlations:
+    pearson:
+      calculate: true
+      warn_high_correlations: true
+      threshold: 0.9
+    spearman:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+    kendall:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+    phi_k:
+      calculate: false
+      warn_high_correlations: false
+      threshold: 0.9
+    cramers:
+      calculate: false
+      warn_high_correlations: true
+      threshold: 0.9
+
+
+# Bivariate / Pairwise relations
+interactions:
+  targets: ['MentionDocTone', 'MentionTimeDate']
+  continuous: true
+
+# For categorical
+categorical_maximum_correlation_distinct: 100
+
+report:
+  precision: 10
+
+# Plot-specific settings
+plot:
+    # Image format (svg or png)
+    image_format: "svg"
+    dpi: 500
+
+    scatter_threshold: 1000
+
+    correlation:
+        cmap: 'RdBu'
+        bad: '#000000'
+
+    missing:
+        cmap: 'RdBu'
+        # Force labels when there are > 50 variables
+        # https://github.com/ResidentMario/missingno/issues/93#issuecomment-513322615
+        force_labels: true
+
+    pie:
+        # display a pie chart if the number of distinct values is smaller or equal (set to 0 to disable)
+        max_unique: 10
+
+    histogram:
+        x_axis_labels: true
+
+        # Number of bins (set to 0 to automatically detect the bin size)
+        bins: 40
+
+        # Maximum number of bins (when bins=0)
+        max_bins: 250
+
+# The number of observations to show
+n_obs_unique: 20
+n_extreme_obs: 10
+n_freq_table_max: 30
+
+# Use `deep` flag for memory_usage
+memory_deep: false
+
+# Configuration related to the duplicates
+duplicates:
+    head: 10
+    key: "# duplicates"
+
+# Configuration related to the samples area
+samples:
+    head: 10
+    tail: 10
+    random: 0
+
+# Configuration related to the rejection of variables
+reject_variables: true
+
+# When in a Jupyter notebook
+notebook:
+    iframe:
+        height: '800px'
+        width: '100%'
+        # or 'src'
+        attribute: 'srcdoc'
+
+html:
+    # Minify the html
+    minify_html: true
+
+    # Offline support
+    use_local_assets: true
+
+    # If true, single file, else directory with assets
+    inline: true
+
+    # Show navbar
+    navbar_show: true
+
+    # Assets prefix if inline = true
+    assets_prefix: null
+
+    # Styling options for the HTML report
+    style:
+      theme: null
+      logo: ""
+      primary_color: "#337ab7"
+
+    full_width: false

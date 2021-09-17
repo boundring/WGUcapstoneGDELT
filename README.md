@@ -170,17 +170,17 @@ GDELTeda class member functions:
 
 - batchEDA()
     Reshapes and re-types GDELT records for generating Pandas Profiling ProfileReport()-automated, exhaustive EDA reports from Pandas DataFrames from MongoDB-query-cursors. WARNING: extremely RAM, disk I/O, and processing intensive. Be aware of what resources are available for these operations at runtime.
-	
-	Relies on Python multiprocessing.Pool.map() calls against class member functions eventsBatchEDA() and mentionsBatchEDA(), and a regular call on gkgBatchEDA(), which uses multiprocessing.Pool.map() calls within it.
+  
+  Relies on Python multiprocessing.Pool.map() calls against class member functions eventsBatchEDA() and mentionsBatchEDA(), and a regular call on gkgBatchEDA(), which uses multiprocessing.Pool.map() calls within it.
 
 - eventsBatchEDA()
     Performs automatic EDA on GDELT Events record subsets. See function batchEDA() for "if table == 'events':" case handling and how this function is invoked as a multiprocessing.Pool.map() call, intended to isolate its RAM requirements for deallocation upon Pool.close().
-	
+  
     In its current state, this function can handle collections of GDELT Events records up to at least the size of the batch EDA test subset used in this capstone project, the 30 day period from 05/24/2020 to 06/22/2020.
 
 - mentionsBatchEDA()
     Performs automatic EDA on GDELT Mentions record subsets. See function batchEDA() for "if table == 'mentions':" case handling and how this function is invoked as a multiprocessing.Pool.map() call, intended to isolate its RAM requirements for deallocation upon Pool.close().
-	
+  
     In its current state, this function can handle collections of GDELT Mentions records up to at least the size of the batch EDA test subset used in this capstone project, the 30 day period from 05/24/2020 to 06/22/2020.
 
 - gkgBatchEDA()
@@ -207,7 +207,7 @@ GDELTeda class member functions:
 
 - loopEDA()
     Loops calls of realtimeEDA() N iterations, where N is equal to parameter window multiplied appropriately for parameter windowUnit. Handles various potential failure states and delays execution of iterations until each next set of datafiles should be available.
-	Note: this function has specifically been designed to collect current and future GDELT datafiles, rather than collecting specified windows within however many updates prior to the current update, as that functionality can already be achieved with GDELTbase.py or GDELTjob.py class member functions.
+  Note: this function has specifically been designed to collect current and future GDELT datafiles, rather than collecting specified windows within however many updates prior to the current update, as that functionality can already be achieved with GDELTbase.py or GDELTjob.py class member functions.
 
   Please see GDELTeda.py and its documentation per-function for details regarding operations and parameters required for their use.
 
@@ -223,52 +223,52 @@ GDELTedaGKGhelpers class member functions:
 
 - pullMainGKGcolumns()
     Extracts all non-variable-length columns for GKG records present in local MongoDB instance and converts them into a returned Pandas DataFrame.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
 
 - applyDtypes()
     Calls tableDF.astype(dtype = columnTypes, copy = False), returns resulting typed DataFrame.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
 
 - convertDatetimes()
     Calls pd.todatetime(tableDF[datetimeField], datetimeFormat), returns resulting modified DataFrame.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
 
 - convertGKGV15Tone()
     Converts V15Tone subfield key:value pairs to V15Tone_X columns, returns resulting modified DataFrame.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
 
 - mainReport()
     Generates basic EDA on GKG columns not subject to variable-length values.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
 
 - locationsReport()
     Converts V1Locations subfield dict lists to V1Locations_X columns as a DataFrame normalized for variable-length lists of locations, which is then used to generate a Pandas Profiling report.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
-	
-	WARNING: the current memory signature of this function's use on 31 days of GDELT GKG records (reported as 4373849 records, expanded to over 16077985 records with explode() on V1Locations, reported size 2.3GB in Pandas DataFrame form) is over 30GB in Python.exe alone. Both RAM and disk I/O will be dominated by these operations for any large GKG subsets.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  
+  WARNING: the current memory signature of this function's use on 31 days of GDELT GKG records (reported as 4373849 records, expanded to over 16077985 records with explode() on V1Locations, reported size 2.3GB in Pandas DataFrame form) is over 30GB in Python.exe alone. Both RAM and disk I/O will be dominated by these operations for any large GKG subsets.
 
 - countsReport()
     Converts V1Counts subfield dict lists to V1Counts_X columns as a DataFrame normalized for variable-length lists of counts, which is then used to generate a Pandas Profiling report.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
-	
-	WARNING: this function is not working for the 30 day batch EDA test subset of GDELT records. As such, it's been left in place as potentially operable for smaller sets, but such testing has not been performed as part of this capstone project.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  
+  WARNING: this function is not working for the 30 day batch EDA test subset of GDELT records. As such, it's been left in place as potentially operable for smaller sets, but such testing has not been performed as part of this capstone project.
 
 - themesReport()
     Converts V1Themes subfield lists to individual column values as a DataFrame normalized for variable-length lists of themes, which is then used to generate a Pandas Profiling report.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
-	
-	WARNING: this function is not working for the 30 day batch EDA test subset of GDELT records. As such, it's been left in place as potentially operable for smaller sets, but such testing has not been performed as part of this capstone project.
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  
+  WARNING: this function is not working for the 30 day batch EDA test subset of GDELT records. As such, it's been left in place as potentially operable for smaller sets, but such testing has not been performed as part of this capstone project.
 
 - personsReport()
     Converts V1Persons subfield lists to individual column values as a DataFrame normalized for variable-length lists of persons, which is then used to generate a Pandas Profiling report.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
-	
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  
     WARNING: this function is not working for the 30 day batch EDA test subset of GDELT records. As such, it's been left in place as potentially operable for smaller sets, but such testing has not been performed as part of this capstone project.
 
 - organizationsReport()
     Converts V1Organizations subfield lists to individual column values as a DataFrame normalized for variable-length lists of organizations, which is then used to generate a Pandas Profiling report.
-	Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
-	
+  Intended for use in GDELTeda.py, GDELTeda.gkgBatchEda() multiprocessing.Pool().map() calls.
+  
     WARNING: this function is not working for the 30 day batch EDA test subset of GDELT records. As such, it's been left in place as potentially operable for smaller sets, but such testing has not been performed as part of this capstone project.
 
 Please see GDELTedaGKGhelpers.py and its documentation per-function for details regarding operations and parameters required for their use.
