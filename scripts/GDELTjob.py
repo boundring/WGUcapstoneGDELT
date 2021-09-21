@@ -28,11 +28,11 @@ Shared class data:
 -----------------
 
 dateList -- list of strings.
-Values must be formatted like 'YYYY/MM/DD'.
+  Values must be formatted like 'YYYY/MM/DD'.
 Controls what dates will be passed to GDELTbase.downloadGDELTDay().
 
 tableList -- list of strings, default ['events','mentions','gkg'].
-Values must be one or more of ['events', 'gkg', 'mentions'].
+  Values must be one or more of ['events', 'gkg', 'mentions'].
 GDELTbase can tolerate repeating values in this list, but will be forced
 to skip any number of files in downloading, cleaning, and storing.
 

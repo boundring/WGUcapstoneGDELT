@@ -9,19 +9,43 @@ GDELTbase.py
 GDELT files with column reduction, parsing/cleaning to JSON format, and export
 of cleaned records to MongoDB.
 
+  Basic use should be by import and implementation within an IDE, or by editing
+section # C00 and running this script directly.
+
+  Primary member functions include descriptive docstrings for their intent and
+use.
+
   See license.txt for information related to each open-source library used.
 
   WARNING: project file operations are based on relative pathing from the
-'scripts' directory this Python script is located in, given the preexistence
-of directory 'GDELTdata' parallel to 'scripts'. In the case of that directory
-structure being broken or altered somehow, shared class data variable
-toolData['projectPath'] may be edited to suit the location desired for a
-project directory.
+'scripts' directory this Python script is located in, given the creation of
+directory 'GDELTdata' parallel to 'scripts' upon first GDELTbase class
+initialization. The simplest option would be to force relative pathing to this
+script's operations, but given later need to instantiate objects of this class
+in GDELTeda--for realtime EDA, given a requirement for on-time acquisition of
+datafiles, and so timed execution of downloadGDELTFile() calls--unpredictable
+path behavior cannot be permitted. Therefore, barring deletion of GDELTdata,
+individual users of this script should  alter shared class data variable
+toolData['projectPath'] suit the location desired for this script's project
+directory.
 
+  WARNING: project file operations are based on relative pathing from the
+'scripts' directory this Python script is located in, given the creation of
+directories 'GDELTdata' and 'EDAlogs' parallel to 'scripts' upon first
+GDELTbase and GDELTeda class initializations.
+If those directories are not already present, a fallback method for
+string-literal directory reorientation may be found in GDELTbase shared class
+data at this tag: # A01a - backup path specification.
+Any given user's project directory must be specified there.
+See also GDELTeda.py, tag # A02b - Project directory path, as any given user's
+project directory must be specified for that os.chdir() call, also.
 
 Contents:
   A00 - GDELTbase
     A01 - shared class data (toolData, localDb)
+      A01a - backup path specification
+      Note: Specification at A01a should be changed to suit a user's desired
+            directory structure, given their local filesystem.
     A02 - __init__ w/ instanced data (localFiles)
   B00 - class methods
     B01 - updateLocalFilesIndex
@@ -102,6 +126,7 @@ mongoTable()
 
   # A01 - shared class data
   toolData = {}
+  # A01a - backup path specification
   #   Failsafe path for local main project directory. Must be changed to suit
   # location of any given end-user's 'script' directory in case directory
   # 'GDELTdata' is not present one directory up.
@@ -305,16 +330,16 @@ mongoTable()
       'MentionType',
       'MentionSourceName',
       'MentionIdentifier',
-      'SentenceID',
-      'Actor1CharOffset',
-      'Actor2CharOffset',
-      'ActionCharOffset',
+      'SentenceID', #
+      'Actor1CharOffset',#
+      'Actor2CharOffset',#
+      'ActionCharOffset',#
       'InRawText',
       'Confidence',
-      'MentionDocLen',
+      'MentionDocLen', #
       'MentionDocTone',
-      'MentionDocTranslationInfo',
-      'Extras',
+      'MentionDocTranslationInfo', #
+      'Extras', #
       ],
     'reduced' : [
       'GLOBALEVENTID',
@@ -1171,16 +1196,19 @@ conversion to float for 'events' Latitude/Longitude field values.
       if verbose:
         print("D.")
       try:
-        # this dropna is unfortunately necessary due to GKG's V2EXTRASXML field
-        #   values occasionally mixing newline characters into the PAGE_LINKS
-        #   subfield, albeit only rarely, resulting in junk rows that Pandas
-        #   is apparently failing to discard...
+        #   This dropna is unfortunately necessary due to GKG's V2EXTRASXML
+        # field values occasionally mixing newline characters into the
+        # PAGE_LINKS subfield, albeit only rarely, resulting in junk rows that
+        # Pandas is apparently failing to discard...
         cleanDF = cleanDF.dropna(axis = 0, thresh = 5)
-        # Even this dropna() has no apparent effect, as this line's raised
-        #   exception reveals junk rows in almost 20 files across the 31 day
-        #   test batch. 20 out of 2758 GKG giles (8274 across all tables) isn't
-        #   that bad, so I've corrected the junk rows by hand.
+        #   Even this dropna() has no apparent effect, as this line's raised
+        # exception reveals junk rows in almost 20 files across the 31 day test
+        # batch. 20 out of 2758 GKG giles (8274 across all tables) isn't that
+        # bad, so I've corrected the junk rows by hand.
         cleanDF["V21DATE"] = cleanDF["V21DATE"].apply(dtConverter)
+        #   My apologies for not properly handling this rare bug-case on the
+        # part of that specific portion of GKG record formatting. The field
+        # isn't even providing any tangible value, given its description...
       except ValueError as e:
         print("Error: %s" % (e))
         return False
@@ -1444,109 +1472,164 @@ See parameter description for 'verbose' for printed output.
 # C00
 # in-design iterative testing with direct execution
 if __name__ == "__main__":
-
-  ''' Preserving old tests in case of later need, reference by end users.
-  
   print("####################################################################")
   print("##########               GDELTbase testing                ##########")
   print("####################################################################")
   
+  # Initial object functionality testing...
+
   print("\nInstantiating Gbase...")
   Gbase = GDELTbase()
-  
+
   print("\nTrying showLocalFiles()...")
-  Gbase.showLocalFiles(True)
+  Gbase.showLocalFiles()
 
-  tables = ['events', 'mentions', 'gkg']
-  
-
-  for table in tables:
-    Gbase.cleanTable(table, verbose = True)
+  ''' Preserving old tests in case of later need, reference by end users.
 
   print("\n------------------------------------------------------------------")
 
-  # Initial object functionality testing...
+  # Use case: you need to download, preprocess, and store a lot of GDELT data.
+
+  # Downloading up to 93 datafiles per-table, per-day:
 
   print("\nTesting downloadGDELTDay()...")
+
   Gbase.downloadGDELTDay('2021/06/25', 'events')
   Gbase.downloadGDELTDay('2021/06/25', 'gkg')
   Gbase.downloadGDELTDay('2021/06/25', 'mentions')
 
+  # Automatically cleaning raw GDELT records to JSON files for export:
+
   print("\nTesting cleanTable()...")
+
   Gbase.cleanTable('events')
   Gbase.cleanTable('gkg')
   Gbase.cleanTable('mentions')
 
+  #   Automatically batch-exporting all currently acquired datafiles, to
+  # MongoDB collections, per-table:
+
   print("\nTesting mongoTable()...")
+
   Gbase.mongoTable('events')
   Gbase.mongoTable('gkg')
   Gbase.mongoTable('mentions')
 
+  #   Batch EDA methods (experimental) may be found in GDELTeda.py, along with
+  # realtime EDA methods. GDELTbase methods need not be called directly for
+  # them to see use in GDELTeda.realtimeEDA(), automated generation of EDA
+  # profiles for current GDELT update datafiles.
+
   print("\n------------------------------------------------------------------")
   
-  # Verifying column datatype mapping and record integrity, per-table
+  #   Verifying column datatype mapping and record integrity, per-table...
 
+  #   The remaining sections of code are intended to provide some insight on
+  # basic handling of GDELT data, given GDELTbase-provided mappings, and
+  # utility functions from Pandas.
 
   print("\nChecking record parsing results...\n")
 
   # Events record parsing
 
+  # replace this string with the known filename of a raw GDELT file currently
+  # found in the appropriate project directory.
   eFN = '20210513220000.export.CSV'
+
   os.chdir(Gbase.toolData['path']['events']['raw'])
+
   print("Testing file cleaning for events...")
+
   Gbase.cleanFile(eFN)
+
   os.chdir(Gbase.toolData['path']['events']['clean'])
+
   print("Reading cleaned file...\n")
+
   eDf = pd.read_csv(
     eFN, sep = '\t', dtype = Gbase.toolData['columnTypes']['events'],
     converters = {'DATEADDED': (lambda x: pd.to_datetime(str(x),
                                                          format="%Y%m%d%H%M%S",
                                                          errors='ignore'))}
     )
+
   print("Checking re-read cleaned file column datatypes...\n")
+
   pp(eDf.dtypes)
+
   print("")
+
   eDict = eDf.to_dict(orient = 'records')
+
   print("Record 0:")
+
   pp(eDict[0])
+
   print("Record 1:")
+
   pp(eDict[1])
+
   
   print("\n------------------------------------------------------------------")
 
   # Global Knowledge Graph record parsing
 
+  # replace this string with the known filename of a raw GDELT file currently
+  # found in the appropriate project directory.
   gFN = '20210513220000.gkg.csv'
+
   os.chdir(Gbase.toolData['path']['gkg']['raw'])
+
   print("Testing file cleaning for gkg...")
+
   Gbase.cleanFile(gFN)
+
   os.chdir(Gbase.toolData['path']['gkg']['clean'])
+
   print("Reading cleaned file...\n")
+
   gDf = pd.read_csv(
     gFN, sep = '\t', dtype = Gbase.toolData['columnTypes']['gkg'],
     converters = {'V21DATE': (lambda x: pd.to_datetime(str(x),
                                                          format="%Y%m%d%H%M%S",
                                                          errors='ignore'))}
     )
+
   print("Checking re-read cleaned file column datatypes...\n")
+
   pp(gDf.dtypes)
+
   print("")
+
   gDict = gDf.to_dict(orient = 'records')
+
   print("Record 0:")
+
   pp(gDict[0])
+
   print("Record 1:")
+
   pp(gDict[1])
+
 
   print("\n------------------------------------------------------------------")
   
   # Mentions record parsing
 
+  # replace this string with the known filename of a raw GDELT file currently
+  # found in the appropriate project directory.
   mFN = '20210513220000.mentions.CSV'
+
   os.chdir(Gbase.toolData['path']['mentions']['raw'])
+  
   print("Testing file cleaning for mentions...")
+  
   Gbase.cleanFile(mFN)
+  
   os.chdir(Gbase.toolData['path']['mentions']['clean'])
+  
   print("Reading cleaned file...\n")
+  
   mDf = pd.read_csv(
     mFN, sep = '\t', dtype = Gbase.toolData['columnTypes']['mentions'],
     converters = {'EventTimeDate': (lambda x: pd.to_datetime(str(x),
@@ -1556,36 +1639,24 @@ if __name__ == "__main__":
                                                          format="%Y%m%d%H%M%S",
                                                          errors='ignore'))}
     )
+  
   print("Checking re-read cleaned file column datatypes...\n")
+  
   pp(mDf.dtypes)
+  
   print("")
+  
   mDict = mDf.to_dict(orient = 'records')
+  
   print("Record 0:")
+  
   pp(mDict[0])
+  
   print("Record 1:")
+  
   pp(mDict[1])
 
   print("\n------------------------------------------------------------------")
-
-  #   A wildcard text index can potentially speed up any MongoDB queries that
-  # require string matching, applicable for all columns.
-  #   Creation of these indexes may take a long time, depending on the total
-  # size in records and disk-volume of a given collection.
-
-  print("\nRebuilding Events wildcard text index...", end='')
-  timecheck = time()
-  Gbase.localDb['collections']['events'].create_index([("$**", pymongo.TEXT)])
-  print("done (%0.3fs)" % (float(time()) - float(timecheck)))
-
-  print("\nRebuilding Mentions wildcard text index...", end='')
-  timecheck = time()
-  Gbase.localDb['collections']['mentions'].create_index([("$**",pymongo.TEXT)])
-  print("done (%0.3fs)" % (float(time()) - float(timecheck)))
-
-  print("\nRebuilding GKG wildcard text index (takes a minute)...", end='')
-  timecheck = time()
-  Gbase.localDb['collections']['gkg'].create_index([("$**", pymongo.TEXT)])
-  print("done (%0.3fs)" % (float(time()) - float(timecheck)))
 
   '''
 

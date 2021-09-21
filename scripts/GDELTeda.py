@@ -12,6 +12,16 @@ section # C00 and running this script directly.
   Primary member functions include descriptive docstrings for their intent and
 use.
 
+  WARNING: project file operations are based on relative pathing from the
+'scripts' directory this Python script is located in, given the creation of
+directories 'GDELTdata' and 'EDAlogs' parallel to 'scripts' upon first
+GDELTbase and GDELTeda class initializations. If those directories are not
+already present, a fallback method for string-literal directory reorientation
+may be found in '__init__()' at this tag: # A02b - Project directory path.
+Specification for any given user's main project directory should be made for
+that os.chdir() call.
+See also GDELTbase.py, tag # A01a - backup path specification, as any given
+user's project directory must be specified there, also.
 
 Contents:
   A00 - GDELTeda
@@ -223,9 +233,9 @@ Parameters:
 ----------
 
 tableList - list of strings, default ['events','mentions','gkg']
-  Controls detection and creation of .../EDALogs/... subdirectories for
+   Controls detection and creation of .../EDALogs/... subdirectories for
  collection of Pandas Profiling ProfileReport HTML EDA document output.
-  Also controls permission for class member functions to perform
+   Also controls permission for class member functions to perform
  operations on tables specified by those functions' tableList parameters
  as a failsafe against a lack of project directories required for those
  operations, specifically output of HTML EDA documents.
@@ -234,7 +244,7 @@ output:
 ------
 
   Produces exhaustive EDA for GDELT record subsets for specified tables
-through Pandas Profiling ProfileReport-output HTML documents.
+ through Pandas Profiling ProfileReport-output HTML documents.
   All procedurally automated steps towards report generation are shown
  in console output during script execution.
     '''
@@ -1732,9 +1742,10 @@ if __name__ == "__main__":
   # discretion.
   gEDA01.gBase.wipeLocalFiles(state = 'realtime', verbose = True)
   
-  #   default is 1 file downloaded per table, one profile produced per 'events'
-  # and 'mentions', and six profiles produced for 'gkg' (main, locations,
-  # counts, themes, persons, and organizations).
-  gEDA01.realtimeEDA()
 
+  #   Default for realtimeEDA() parameters (no specification) is 1 file
+  # downloaded per table, one profile produced per 'events' and 'mentions', and
+  # six profiles produced for 'gkg' (main, locations, counts, themes, persons,
+  # and organizations).
+  gEDA01.realtimeEDA()
 
