@@ -48,6 +48,7 @@ Class methods:
 download()
 clean()
 store()
+execute()
   '''
 
   # A01
@@ -135,7 +136,7 @@ if __name__ == "__main__":
   # Previously-run GDELT data acquisition, preprocessing, and MongoDB storage
   
   # COMPLETED POST-DEBUG ON 2021-08-22
-  # A MONTH OF BLACK LIVES MATTERS PROTESTS
+  # A MONTH OF BLACK LIVES MATTER PROTESTS
   #     Initial batch EDA testing set formed from days before and after
   # reporting of George Floyd's death at the hands of Derek Chauvin, and
   # ensuing coverage of protests and related events throughout the next 30 days
@@ -161,7 +162,7 @@ if __name__ == "__main__":
   
   gJob = GDELTjob(dateList = jobDates, tableList = tables, verbose = True)
 
-  #   Comment this method call out to permit use of GBASE methods against
+  #   Comment this method call out to permit use of GDELTbase methods against
   # individual files (say, if one or more files fail to be downloaded, cleaned,
   # or stored in MongoDB, and need to be re-tried individually).
   gJob.execute()

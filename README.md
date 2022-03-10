@@ -6,7 +6,7 @@ September 2021
 
 ---
 
-Hi there. I needed to create a simplified pipeline for GDELT news media analysis as part of my capstone project for a degree in Data Management/Analytics with Western Governors University. So, given a lot of time and effort, I'd like to provide the scripted tools I needed to develop for that pipeline for public use. Here's hoping other students or individuals will find some use in the cluttered, often needlessly detailed commentary provided in each script's documentation of key functions and processes in acquisition, preprocessing, storage, querying, and simple EDA on GDELT records for Events/Mentions and GKG--notably excepting GKG's GCAM measures, which were considered outside the scope of the project.
+Hi there. I made a simplified pipeline for GDELT news media analysis as part of my capstone project for a degree in Data Management/Analytics with Western Governors University. So, given a lot of time and effort, I'd like to provide the scripted tools I needed to develop for that pipeline for public use. Here's hoping other students or individuals will find some use in the cluttered, often needlessly detailed commentary provided in each script's documentation of key functions and processes in acquisition, preprocessing, storage, querying, and simple EDA on GDELT records for Events/Mentions and GKG--notably excepting GKG's GCAM measures, which were considered outside the scope of the project.
 
 ---
 
@@ -14,24 +14,19 @@ Contents:
 - 000 - Dedication
 - 001 - Disclaimer
 - A00 - Python version, MongoDB, and Python packages required.
- - A01 - General design structure, intent, and documentation provided.
+   - A01 - General design structure, intent, and documentation provided.
 - B00 - files
- - B01 - GDELTbase.py
- - B02 - GDELTjob.py
- - B03 - GDELTeda.py
- - B04 - GDELTedaGKGhelpers.py
-- C00 - Basic uses
- - C01 - Mass download, preprocessing, and storage of GDELT files
- - C02 - Realtime download, preprocessing, and storage of GDELT files
- - C03 - Batch EDA on GDELT records
- - C04 - Realtime EDA on GDELT records
-- D00 - Potential for improvements
+   - B01 - GDELTbase.py
+   - B02 - GDELTjob.py
+   - B03 - GDELTeda.py
+   - B04 - GDELTedaGKGhelpers.py
+- C00 - Potential for improvements
 
 ---
 
 000 - Dedication
 
-  To my partner Cathy for being an ever-present source of support and care in my life, and throughout the design and implementation of this project.
+  To my partner Cathy, for being an ever-present source of support and care in my life, and throughout the design and implementation of this project.
   To my family and friends, for much the same reasons.
   To all of my teachers, Piedmont Virginia Community College, and Western Governors University for all of the time and care that has been taken with my education on so many fronts.
   To the study of the world and its data, and the never-ending search for reasons and ways to do more good for more life, everywhere.
@@ -275,7 +270,7 @@ Please see GDELTedaGKGhelpers.py and its documentation per-function for details 
 
 ---
 
-D00 - Potential for improvements
+C00 - Potential for improvements
 
   Any programmer with more than an arbitrary level of experience would likely scratch their head and wonder why any number of choices were made toward design and completion of this project: it has been designed and implemented by a programmer with less than that arbitrary level of experience, according to the results of their consideration of basic requirements for basic functionality.
 

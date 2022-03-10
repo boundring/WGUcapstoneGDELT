@@ -40,6 +40,7 @@ Contents:
     B05 - realtimeEDA()
     B06 - loopEDA()
   C00 - main w/ testing
+    C01 - previously-run GDELT realtime EDA testing
 '''
 
 import json
@@ -435,7 +436,7 @@ Parameters:
   
 mode - arbitrary
   This parameter is included to meet Python multiprocessing.Pool.map()
- function requirements. As such, it it present only to receive a
+ function requirements. As such, it is present only to receive a
  parameter determined by map(), e.g. one iteration of the function will
  execute.
 
@@ -1716,6 +1717,11 @@ wait at most 1 hour and 15 minutes before checking for another set of updates.
 # C00
 # in-design iterative testing with direct execution
 if __name__ == "__main__":
+  # C01
+  ''' This commented-out section is for saving previously-run test code, which
+# may be of use in developing an understanding of this class and its methods,
+# used here to perform testing on realtime EDA functionality.
+
   print("####################################################################")
   print("##########               GDELTeda testing                 ##########")
   print("####################################################################")
@@ -1748,4 +1754,4 @@ if __name__ == "__main__":
   # six profiles produced for 'gkg' (main, locations, counts, themes, persons,
   # and organizations).
   gEDA01.realtimeEDA()
-
+'''
