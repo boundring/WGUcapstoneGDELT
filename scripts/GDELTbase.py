@@ -19,18 +19,6 @@ use.
 
   WARNING: project file operations are based on relative pathing from the
 'scripts' directory this Python script is located in, given the creation of
-directory 'GDELTdata' parallel to 'scripts' upon first GDELTbase class
-initialization. The simplest option would be to force relative pathing to this
-script's operations, but given later need to instantiate objects of this class
-in GDELTeda--for realtime EDA, given a requirement for on-time acquisition of
-datafiles, and so timed execution of downloadGDELTFile() calls--unpredictable
-path behavior cannot be permitted. Therefore, barring deletion of GDELTdata,
-individual users of this script should  alter shared class data variable
-toolData['projectPath'] suit the location desired for this script's project
-directory.
-
-  WARNING: project file operations are based on relative pathing from the
-'scripts' directory this Python script is located in, given the creation of
 directories 'GDELTdata' and 'EDAlogs' parallel to 'scripts' upon first
 GDELTbase and GDELTeda class initializations.
 If those directories are not already present, a fallback method for
